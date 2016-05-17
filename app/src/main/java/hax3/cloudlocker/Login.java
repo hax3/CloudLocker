@@ -4,9 +4,12 @@ import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -37,6 +40,12 @@ public class Login extends Activity {
     private EditText editTextUserId;
     private EditText editTextPassword;
 
+    /*자동로그인*/
+    CheckBox Auto_LogIn;
+    SharedPreferences setting;
+    SharedPreferences.Editor editor;
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -44,6 +53,37 @@ public class Login extends Activity {
 
         editTextUserId = (EditText) findViewById(R.id.editTextUserId);
         editTextPassword = (EditText) findViewById(R.id.editTextPassword);
+
+        Auto_LogIn = (CheckBox) findViewById(R.id.Auto_LogIn);
+        setting = getSharedPreferences("setting", 0);
+        editor= setting.edit();
+
+        if(setting.getBoolean("Auto_Login_enabled", false)){
+            editTextUserId.setText(setting.getString("ID", ""));
+            editTextPassword.setText(setting.getString("PW", ""));
+            userid = editTextUserId.getText().toString();
+            password = editTextPassword.getText().toString();
+            login(userid, password);
+        }
+        Auto_LogIn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                // TODO Auto-generated method stub
+                if(isChecked){
+
+                    editor.putString("ID", userid);
+                    editor.putString("PW", password);
+                    editor.putBoolean("Auto_Login_enabled", true);
+                    editor.commit();
+                }else{
+                    editor.remove("ID");
+                    editor.remove("PW");
+                    editor.remove("Auto_Login_enabled");
+                    editor.clear();
+                    editor.commit();
+                }
+            }
+        });
     }
 
     public void invokeRegister(View view) {
@@ -59,7 +99,7 @@ public class Login extends Activity {
 
     }
 
-    private void login(final String userid, String password) {
+    private void login(final String userid, final String password) {
 
         class LoginAsync extends AsyncTask<String, Void, String> {
 
@@ -117,6 +157,9 @@ public class Login extends Activity {
                 String s = result.trim();
                 loadingDialog.dismiss();
                 if (s.equalsIgnoreCase("success")) {
+                    editor.putString("ID", userid);
+                    editor.putString("PW", password);
+                    editor.commit();
                     Intent intent = new Intent(Login.this, MainActivity.class);
                     intent.putExtra(USER_ID, userid);
                     finish();
