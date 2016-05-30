@@ -16,23 +16,23 @@
         android:layout_height="match_parent"
         android:gravity="center">
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/locker1"
-            android:layout_above="@+id/locker2"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/button_white"
-            android:layout_marginBottom="10dp"
-            />
+            android:id="@+id/imageButton"
+            android:background="#00000000"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="15dp"
+            android:src="@drawable/button_white" />
 
-        <ImageView
+        <ImageButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/locker2"
-            android:layout_above="@+id/space"
-            android:layout_centerHorizontal="true"
-            android:src="@drawable/button_gray"/>
+            android:id="@+id/imageButton2"
+            android:background="#00000000"
+            android:layout_marginBottom="15dp"
+            android:layout_gravity="center_horizontal"
+            android:src="@drawable/button_gray" />
 
         <TableLayout
             android:layout_width="match_parent"

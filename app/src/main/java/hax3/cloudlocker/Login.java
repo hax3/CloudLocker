@@ -22,6 +22,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -34,12 +37,12 @@ import java.util.List;
 
 public class Login extends Activity {
 
-    public static final String USER_ID = "USERID";
+    public static final String LOCKER_NUM = "LOCKERNUM";
     String userid;
     String password;
     private EditText editTextUserId;
     private EditText editTextPassword;
-
+    private  int lockerNum;
     /*자동로그인*/
     CheckBox Auto_LogIn;
     SharedPreferences setting;
@@ -65,6 +68,7 @@ public class Login extends Activity {
             password = editTextPassword.getText().toString();
             login(userid, password);
         }
+
         Auto_LogIn.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -96,31 +100,30 @@ public class Login extends Activity {
         password = editTextPassword.getText().toString();
 
         login(userid, password);
-
     }
 
     private void login(final String userid, final String password) {
 
         class LoginAsync extends AsyncTask<String, Void, String> {
 
-            private Dialog loadingDialog;
+                    private Dialog loadingDialog;
 
-            @Override
-            protected void onPreExecute() {
-                super.onPreExecute();
-                loadingDialog = ProgressDialog.show(Login.this, "Please wait", "Loading...");
-            }
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        loadingDialog = ProgressDialog.show(Login.this, "Please wait", "Loading...");
+                    }
 
-            @Override
-            protected String doInBackground(String... params) {
-                String id = params[0];
-                String pass = params[1];
+                    @Override
+                    protected String doInBackground(String... params) {
+                        String id = params[0];
+                        String pass = params[1];
 
-                InputStream is = null;
-                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                nameValuePairs.add(new BasicNameValuePair("userid", id));
-                nameValuePairs.add(new BasicNameValuePair("password", pass));
-                String result = null;
+                        InputStream is = null;
+                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                        nameValuePairs.add(new BasicNameValuePair("userid", id));
+                        nameValuePairs.add(new BasicNameValuePair("password", pass));
+                        String result = null;
 
                 try {
                     HttpClient httpClient = new DefaultHttpClient();
@@ -154,14 +157,25 @@ public class Login extends Activity {
 
             @Override
             protected void onPostExecute(String result) {
-                String s = result.trim();
+                String k = result.trim();
+                String s = "fail";
                 loadingDialog.dismiss();
+                try {
+                    JSONObject jsonObj = new JSONObject(k);
+                    JSONArray data = jsonObj.getJSONArray("result");
+                    JSONObject rsult = data.getJSONObject(0);
+                    s = rsult.getString("result");
+                    lockerNum = rsult.getInt("lockerNum");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
                 if (s.equalsIgnoreCase("success")) {
                     editor.putString("ID", userid);
                     editor.putString("PW", password);
                     editor.commit();
                     Intent intent = new Intent(Login.this, MainActivity.class);
-                    intent.putExtra(USER_ID, userid);
+                    intent.putExtra(LOCKER_NUM, lockerNum);
                     finish();
                     startActivity(intent);
                 } else {
