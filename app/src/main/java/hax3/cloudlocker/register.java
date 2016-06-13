@@ -42,7 +42,6 @@ public class register extends AppCompatActivity implements View.OnClickListener 
     public void onClick(View v) {
         if (v == buttonRegister) {
             registerUser();
-
         }
     }
 

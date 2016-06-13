@@ -38,12 +38,15 @@ import java.util.List;
 public class Login extends Activity {
 
     public static final String LOCKER_NUM = "LOCKERNUM";
+    public static final String USER_ID = "USERID";
     String userid;
     String password;
     private EditText editTextUserId;
     private EditText editTextPassword;
     private  int lockerNum;
+
     /*자동로그인*/
+
     CheckBox Auto_LogIn;
     SharedPreferences setting;
     SharedPreferences.Editor editor;
@@ -74,7 +77,6 @@ public class Login extends Activity {
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
                 // TODO Auto-generated method stub
                 if(isChecked){
-
                     editor.putString("ID", userid);
                     editor.putString("PW", password);
                     editor.putBoolean("Auto_Login_enabled", true);
@@ -106,24 +108,24 @@ public class Login extends Activity {
 
         class LoginAsync extends AsyncTask<String, Void, String> {
 
-                    private Dialog loadingDialog;
+            private Dialog loadingDialog;
 
-                    @Override
-                    protected void onPreExecute() {
-                        super.onPreExecute();
-                        loadingDialog = ProgressDialog.show(Login.this, "Please wait", "Loading...");
-                    }
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                loadingDialog = ProgressDialog.show(Login.this, "Please wait", "Loading...");
+            }
 
-                    @Override
-                    protected String doInBackground(String... params) {
-                        String id = params[0];
-                        String pass = params[1];
+            @Override
+            protected String doInBackground(String... params) {
+                String id = params[0];
+                String pass = params[1];
 
-                        InputStream is = null;
-                        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
-                        nameValuePairs.add(new BasicNameValuePair("userid", id));
-                        nameValuePairs.add(new BasicNameValuePair("password", pass));
-                        String result = null;
+                InputStream is = null;
+                List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>();
+                nameValuePairs.add(new BasicNameValuePair("userid", id));
+                nameValuePairs.add(new BasicNameValuePair("password", pass));
+                String result = null;
 
                 try {
                     HttpClient httpClient = new DefaultHttpClient();
@@ -175,6 +177,7 @@ public class Login extends Activity {
                     editor.putString("PW", password);
                     editor.commit();
                     Intent intent = new Intent(Login.this, MainActivity.class);
+                    intent.putExtra(USER_ID, userid);
                     intent.putExtra(LOCKER_NUM, lockerNum);
                     finish();
                     startActivity(intent);
@@ -183,9 +186,8 @@ public class Login extends Activity {
                 }
             }
         }
-
         LoginAsync la = new LoginAsync();
         la.execute(userid, password);
-
     }
+
 }
